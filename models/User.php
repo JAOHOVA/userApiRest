@@ -48,12 +48,13 @@ class User {
 
         // Créer un nouvel utilisateur dans la base de données avec les données fournies
         try {
-            $query = "INSERT INTO user (username, email, password, roles) VALUES (:username, :email, :password, :roles)";
+            $query = "INSERT INTO user (username, email, password, roles, actif) VALUES (:username, :email, :password, :roles, :actif)";
             $statement = $this->db->prepare($query);
             $statement->bindParam(':username', $userData['username']);
             $statement->bindParam(':email', $userData['email']);
             $statement->bindParam(':password', $hashedPassword);
             $statement->bindParam(':roles', $userData['roles']);
+            $statement->bindParam(':actif', $userData['actif'], PDO::PARAM_INT);
             $statement->execute();
             
             // Renvoyer l'ID du nouvel utilisateur créé
@@ -76,13 +77,14 @@ class User {
 
         // Mettre à jour les informations d'un utilisateur spécifique dans la base de données
         try {
-            $query = "UPDATE user SET username = :username, email = :email, password = :password, roles = :roles WHERE id = :id";
+            $query = "UPDATE user SET username = :username, email = :email, password = :password, roles = :roles, actif = :actif WHERE id = :id";
             $statement = $this->db->prepare($query);
             $statement->bindParam(':id', $userId);
             $statement->bindParam(':username', $newUserData['username']);
             $statement->bindParam(':email', $newUserData['email']);
             $statement->bindParam(':password', $hashedPassword); // Note : Généralement, pour la mise à jour, le mot de passe n'est pas modifié directement de cette manière, mais cette implémentation dépend de vos besoins.
             $statement->bindParam(':roles', $newUserData['roles']);
+            $statement->bindParam(':actif', $newUserData['actif'], PDO::PARAM_INT);
             $statement->execute();
 
             return true;
@@ -98,6 +100,23 @@ class User {
             $query = "DELETE FROM user WHERE id = :id";
             $statement = $this->db->prepare($query);
             $statement->bindParam(':id', $userId);
+            $statement->execute();
+
+            return true;
+        } catch (PDOException $e) {
+            // Gérer les erreurs de requête
+            return false;
+        }
+    }
+
+     // Ajouter la méthode de mise à jour de l'état actif
+     public function updateUserActive($userId, $active) {
+        // Mettre à jour l'état actif d'un utilisateur spécifique dans la base de données
+        try {
+            $query = "UPDATE user SET actif = :actif WHERE id = :id";
+            $statement = $this->db->prepare($query);
+            $statement->bindParam(':id', $userId);
+            $statement->bindParam(':actif', $active, PDO::PARAM_INT);
             $statement->execute();
 
             return true;

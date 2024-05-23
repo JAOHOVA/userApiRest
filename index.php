@@ -58,6 +58,10 @@
                         <label for="roles" class="form-label">Roles:</label>
                         <input type="text" class="form-control" id="roles">
                     </div>
+                    <div class="mb-3">
+                        <label for="active" class="form-label">Actif:</label>
+                        <input type="checkbox" class="form-check-input" id="active">
+                    </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <button type="submit" class="btn btn-primary" onclick="createUser()">Enregistrer</button>
                 </form>
@@ -92,6 +96,10 @@
                     <div class="mb-3">
                         <label for="roles" class="form-label">Roles:</label>
                         <input type="text" class="form-control" id="sRoles">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sActif" class="form-label">Actif:</label>
+                        <input type="checkbox" class="form-check-input" id="sActif">
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-primary" onclick="updateUser()">Enregistrer</button>
@@ -140,7 +148,12 @@
                             </td>
                             <td>${user.email}</td>
                             <td>
-                                <button class="btn btn-warning btn-sm" onclick="showUpdateForm(${user.id}, '${user.username}', '${user.email}', '${user.password}', '${user.roles}')">Modifier</button>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="customSwitch${user.id}" ${user.actif ? 'checked' : ''} onclick="toggleUserActive(${user.id})">
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="showUpdateForm(${user.id}, '${user.username}', '${user.email}', '${user.password}', '${user.roles}', '${user.actif}')">Modifier</button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Supprimer</button>
                             </td>
                         </tr>
@@ -161,23 +174,28 @@
 
     // Fonction pour afficher le formulaire de création
     // FIXME : 
-    function showCreateForm() {
+    /* function showCreateForm() {
         $('#userId').val('');
         $('#username').val('');
         $('#email').val('');
         $('#password').val('');
-        $('#sRoles').val('');
+        $('#roles').val('');
+        $('#active').prop('checked', false);
         $('#userFormModal').modal('show');
-    }
+    } */
 
     // Fonction pour afficher le formulaire de mise à jour
-    function showUpdateForm(userId, username, email, password, roles) {
-        // console.log(userId, username, email);
+    function showUpdateForm(userId, username, email, password, roles, actif) {
+        // console.log(userId, username, email,  password, roles, actif);
+        // Convertir 'actif' en booléen
+        const isActive = actif === '1' || actif === 1 || actif === true;
+
         $('#idUserId').val(userId);
         $('#sUsername').val(username);
         $('#sEmail').val(email);
         $('#sPassword').val(password);
         $('#sRoles').val(roles);
+        $('#sActif').prop('checked', isActive);
         $('#userFormModalUpdate').modal('show');
     }
 
@@ -196,6 +214,8 @@
         const username = $('#username').val();
         const email = $('#email').val();
         const password = $('#password').val();
+        const roles = $('#roles').val();
+        const actif = $('#active').is(':checked') ? 1 : 0;
 
         // Validation de l'adresse e-mail avec une expression régulière
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -216,7 +236,9 @@
             data: JSON.stringify({
                 username: username,
                 email: email,
-                password: password
+                password: password,
+                roles: roles,
+                actif: actif ? 1 : 0
             }),
             success: function(data) {
                 console.log(data.message);
@@ -227,12 +249,13 @@
                 $('#username').val('');
                 $('#email').val('');
                 $('#password').val('');
-
+                $('#roles').val('');
+                $('#active').prop('checked', false);
                 // Masquer la modal
                 $('#userFormModal').modal('hide');
 
                 // Recharger la page après l'action réussie
-                // location.reload();
+                location.reload();
             },
             error: function(error) {
                 console.error('Erreur lors de la création de l\'utilisateur :', error);
@@ -246,6 +269,8 @@
         const username = $('#sUsername').val();
         const email = $('#sEmail').val();
         const password = $('#sPassword').val();
+        const roles = $('#sRoles').val();
+        const actif = $('#sActif').is(':checked');
         // console.log(userId, username, email, password);
 
         // Validation de l'adresse e-mail avec une expression régulière
@@ -267,7 +292,9 @@
             data: JSON.stringify({
                 username: username,
                 email: email,
-                password: password
+                password: password,
+                roles: roles,
+                actif: actif ? 1 : 0
             }),
             success: function(response) {
                 console.log('Réponse de l\'API :', response);
@@ -279,6 +306,26 @@
             },
             error: function(xhr, status, error) {
                 console.error('Erreur lors de la requête AJAX pour mettre à jour l\'utilisateur :', error);
+            }
+        });
+    }
+
+    // Fonction pour changer le statut actif/inactif d'un utilisateur
+    function toggleUserActive(userId) {
+        // Récupérer l'état actuel de l'utilisateur
+        const isActive = $(`#customSwitch${userId}`).is(':checked');
+
+        $.ajax({
+            url: 'routes/api.php?action=updateUserActive&id=' + userId,
+            type: 'PUT',
+            data: JSON.stringify({ actif: isActive }),
+            contentType: 'application/json',
+            success: function(response) {
+                console.log('Statut de l\'utilisateur mis à jour avec succès :', response);
+                // location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error('Erreur lors de la mise à jour du statut de l\'utilisateur :', error);
             }
         });
     }

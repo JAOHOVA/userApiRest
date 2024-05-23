@@ -41,6 +41,13 @@ class UserController {
         echo json_encode(['success' => $result]);
     }
 
+     // Ajouter la méthode updateUserActive
+     public function updateUserActive($userId, $active) {
+        $result = $this->user->updateUserActive($userId, $active);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $result]);
+    }
+
     // Ajouter la méthode de login
     public function login($userData) {
         $result = $this->user->login($userData);

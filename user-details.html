@@ -36,15 +36,19 @@
         if (userId) {
             // Envoyer une requête AJAX pour obtenir les détails de l'utilisateur
             $.ajax({
-                url: `https://userapirest.test/routes/api.php?action=getUserById&id=${userId}`,
+                url: `http://userapirest.test/routes/api.php?action=getUserById&id=${userId}`,
                 type: 'GET',
                 dataType: 'json',
                 success: function(userDetails) {
+                    // Déterminer le statut actif de l'utilisateur
+                    const actifStatus = userDetails.actif ? 'Actif' : 'Inactif';
+
                     // Afficher les détails de l'utilisateur sur la page
                     $('#userDetails').html(`
                         <p><strong>ID:</strong> ${userDetails.id}</p>
                         <p><strong>Nom d'utilisateur:</strong> ${userDetails.username}</p>
                         <p><strong>Email:</strong> ${userDetails.email}</p>
+                        <p><strong>Statut:</strong> ${actifStatus}</p>
                         <!-- Ajoutez d'autres détails de l'utilisateur ici -->
                     `);
                 },
