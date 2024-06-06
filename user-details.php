@@ -6,7 +6,7 @@
     <title>Détails de l'utilisateur</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <div class="container mt-5">
     <h2>Détails de l'utilisateur</h2>
@@ -17,6 +17,12 @@
 
     <a href="javascript:history.back()" class="btn btn-secondary mt-3">Retour</a>
 </div>
+
+<footer class="footer mt-auto py-3 bg-light text-center">
+    <div class="container">
+        <span class="text-muted">Mon site - Tous droits réservés &copy; 2024</span>
+    </div>
+</footer>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -36,7 +42,7 @@
         if (userId) {
             // Envoyer une requête AJAX pour obtenir les détails de l'utilisateur
             $.ajax({
-                url: `http://userapirest.test/routes/api.php?action=getUserById&id=${userId}`,
+                url: `routes/userApi.php?action=getUserById&id=${userId}`,
                 type: 'GET',
                 dataType: 'json',
                 success: function(userDetails) {
@@ -67,6 +73,5 @@
         loadUserDetails();
     });
 </script>
-
 </body>
 </html>

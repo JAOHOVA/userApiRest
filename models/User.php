@@ -145,10 +145,12 @@ class User {
             // Répondre avec le token et les informations utilisateur
             return [
                 'token' => $token,
+                'isLoggedIn' => true,
                 'user' => [
                     'id' => $user['id'],
                     'username' => $user['username'],
-                    'email' => $user['email']
+                    'email' => $user['email'],
+                    'roles' => $user['roles']
                 ]
             ];
         } else {

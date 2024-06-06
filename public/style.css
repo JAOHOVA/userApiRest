@@ -1,0 +1,18 @@
+.card-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050;
+    width: 100%;
+    max-width: 400px;
+}
+.card {
+    border: 1px solid #ced4da;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+#sign {
+    margin-left: auto;
+    margin-right: auto;
+}
