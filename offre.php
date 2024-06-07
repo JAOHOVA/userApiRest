@@ -49,23 +49,15 @@
     <!-- Bouton pour afficher le formulaire de création -->
     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createOffreModal">Créer offre</button>
 
-    <!-- Tableau pour afficher la liste des offres -->
-    <table class="table table-striped table-bordered">
-        <thead class="table-primary">
-            <tr>
-                <th>Titre</th>
-                <th>Date de création</th>
-                <th>Description</th>
-                <th>Statut</th>
-                <th>Entreprise</th>
-                <th>Lieu</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="offreTableBody">
-            <!-- Les données des offres seront affichées ici -->
-        </tbody>
-    </table>
+    <div id="offreTableBody">
+        <!-- Liste des Offres -->
+    </div>
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination">
+            <!-- Pagination Bootstrap sera insérée ici par JavaScript -->
+        </ul>
+    </nav>
 </div>
 
 <!-- Modal de création -->
@@ -271,7 +263,7 @@
             `);
         }
 
-        loadOffres();
+        loadOffres(1); // Commencer par la première page
     });
 
     function logout() {
@@ -285,38 +277,80 @@
         window.location.href = 'index.php';
     }
 
-    function loadOffres() {
+    function loadOffres(page) {
         const apiUrl = 'routes/offreApi.php';
         $.ajax({
-            url: apiUrl + '?action=getAllOffres',
+            url: `${apiUrl}?action=getTotalPages&itemsPerPage=5`,
             type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                response.forEach(function(offre) {
-                    // Créer un objet Date à partir de la chaîne de date
-                    const dateObj = new Date(offre.created_at);
-                    // Formatter la date selon le format souhaité
-                    const formattedDate = `${('0' + dateObj.getDate()).slice(-2)}/${('0' + (dateObj.getMonth() + 1)).slice(-2)}/${dateObj.getFullYear()} ${('0' + dateObj.getHours()).slice(-2)}:${('0' + dateObj.getMinutes()).slice(-2)}:${('0' + dateObj.getSeconds()).slice(-2)}`;
-                    $('#offreTableBody').append(`
-                        <tr>
-                            <td>${offre.titre}</td>
-                            <td>${formattedDate}</td>
-                            <td>${offre.description}</td>
-                            <td>${offre.statut}</td>
-                            <td>${offre.entreprise}</td>
-                            <td>${offre.lieu}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning" onclick="editOffre(${offre.id}, '${echapperQuotes(offre.titre)}', '${offre.created_at}', '${offre.url}', '${echapperQuotes(offre.description)}', '${echapperQuotes(offre.statut)}', '${echapperQuotes(offre.entreprise)}', '${echapperQuotes(offre.lieu)}', ${offre.user_id})">Modifier</button>
-                                <button class="btn btn-sm btn-danger" onclick="confirmDelete(${offre.id})">Supprimer</button>
-                            </td>
-                        </tr>
-                    `);
+            success: function(data) {
+                var totalPages = data.total_pages;
+                // console.log(page);
+                // Maintenant que totalPages est déterminé, charger les offres pour la page spécifiée
+                $.ajax({
+                    url: `${apiUrl}?action=getAllOffres&page=${page}&itemsPerPage=5`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // console.log(data);
+                        displayOffres(data); // Afficher les offres
+                        displayPagination(totalPages, page); // Afficher la pagination
+                    },
+                    error: function(error) {
+                        console.error('Erreur lors de la récupération des offres:', error);
+                    }
                 });
             },
             error: function(xhr, status, error) {
-                console.error('Erreur lors de la récupération des offres :', error);
+                console.error('Erreur lors de la récupération du nombre total de pages:', error);
             }
         });
+    }
+
+    // Fonction pour afficher les données des offres dans une table
+    function displayOffres(offres) {
+        var table = '<table class="table table-striped table-bordered">';
+        table += '<thead class="table-primary"><tr><th>Titre</th><th>Date de création</th><th>Description</th><th>Statut</th><th>Entreprise</th><th>Lieu</th><th>Action</th></tr></thead>';
+        table += '<tbody>';
+        offres.forEach(function(offre) {
+            // Créer un objet Date à partir de la chaîne de date
+            const dateObj = new Date(offre.created_at);
+            // Formatter la date selon le format souhaité
+            const formattedDate = `${('0' + dateObj.getDate()).slice(-2)}/${('0' + (dateObj.getMonth() + 1)).slice(-2)}/${dateObj.getFullYear()} ${('0' + dateObj.getHours()).slice(-2)}:${('0' + dateObj.getMinutes()).slice(-2)}:${('0' + dateObj.getSeconds()).slice(-2)}`;
+
+            table += '<tr>';
+            table += '<td>' + offre.titre + '</td>';
+            table += '<td>' + formattedDate + '</td>';
+            table += '<td>' + offre.description + '</td>';
+            table += '<td>' + offre.statut + '</td>';
+            table += '<td>' + offre.entreprise + '</td>';
+            table += '<td>' + offre.lieu + '</td>';
+            table += '<td>';
+            table += '<button class="btn btn-sm btn-warning" onclick="editOffre(' + offre.id + ', \'' + echapperQuotes(offre.titre) + '\', \'' + offre.created_at + '\', \'' + offre.url + '\', \'' + echapperQuotes(offre.description) + '\', \'' + echapperQuotes(offre.statut) + '\', \'' + echapperQuotes(offre.entreprise) + '\', \'' + echapperQuotes(offre.lieu) + '\', ' + offre.user_id + ')">Modifier</button>';
+            table += '&nbsp;'; // Espace HTML
+            table += '<button class="btn btn-sm btn-danger" onclick="confirmDelete(' + offre.id + ')">Supprimer</button>';
+            table += '</td>';
+            table += '</tr>';
+        });
+        table += '</tbody></table>';
+        $('#offreTableBody').html(table);
+    }
+
+    // Fonction pour afficher la pagination
+    function displayPagination(totalPages, currentPage) {
+        var pagination = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+        pagination += '<li class="page-item ' + (currentPage == 1 ? 'disabled' : '') + '">';
+        pagination += '<a class="page-link" href="#" onclick="loadOffres(' + (currentPage - 1) + ')" tabindex="-1" aria-disabled="true">Précédent</a>';
+        pagination += '</li>';
+
+        for (var i = 1; i <= totalPages; i++) {
+            pagination += '<li class="page-item ' + (i == currentPage ? 'active' : '') + '"><a class="page-link" href="#" onclick="loadOffres(' + i + ')">' + i + '</a></li>';
+        }
+
+        pagination += '<li class="page-item ' + (currentPage == totalPages ? 'disabled' : '') + '">';
+        pagination += '<a class="page-link" href="#" onclick="loadOffres(' + (currentPage + 1) + ')">Suivant</a>';
+        pagination += '</li></ul></nav>';
+
+        $('#pagination').html(pagination);
     }
 
     function echapperQuotes(str) {

@@ -9,11 +9,15 @@ class Offre {
         $this->db = $db;
     }
 
-    public function getAllOffres() {
-        // Récupérer tous les utilisateurs depuis la base de données
+    public function getAllOffres($page, $itemsPerPage) {
+        // Récupérer tous les offres paginés depuis la base de données
         try {
-            $query = "SELECT * FROM offres";
-            $statement = $this->db->query($query);
+            $offset = ($page - 1) * $itemsPerPage;
+            $query = "SELECT * FROM offres LIMIT :offset, :itemsPerPage";
+            $statement = $this->db->prepare($query);
+            $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+            $statement->bindParam(':itemsPerPage', $itemsPerPage, PDO::PARAM_INT);
+            $statement->execute();
             $offres = $statement->fetchAll(PDO::FETCH_ASSOC);
             return $offres;
         } catch (PDOException $e) {
@@ -21,6 +25,20 @@ class Offre {
             return array();
         }
     }
+    
+    public function getTotalPages($itemsPerPage) {
+        try {
+            $query = "SELECT COUNT(*) AS total FROM offres";
+            $statement = $this->db->query($query);
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            $totalItems = $result['total'];
+            return ceil($totalItems / $itemsPerPage);
+        } catch (PDOException $e) {
+            // Gérer les erreurs de requête
+            return 1; // Par défaut, s'il y a une erreur, retourner 1 page
+        }
+    }
+    
 
     public function getOffreById($offreId) {
         // Récupérer une offre par son ID depuis la base de données
@@ -109,16 +127,4 @@ class Offre {
         }
     }
 
-    public function getTotalPages($itemsPerPage) {
-        try {
-            $query = "SELECT COUNT(*) AS total FROM offres";
-            $statement = $this->db->query($query);
-            $result = $statement->fetch(PDO::FETCH_ASSOC);
-            $totalItems = $result['total'];
-            return ceil($totalItems / $itemsPerPage);
-        } catch (PDOException $e) {
-            // Gérer les erreurs de requête
-            return 1; // Par défaut, s'il y a une erreur, retourner 1 page
-        }
-    }
 }

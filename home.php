@@ -58,6 +58,12 @@
     <div id="offres-table">
         <!-- Liste des Offres -->
     </div>
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination">
+            <!-- Pagination Bootstrap sera insérée ici par JavaScript -->
+        </ul>
+    </nav>
 </div>
 
 <footer class="footer mt-auto py-3 bg-light text-center">
@@ -71,20 +77,35 @@
 <!-- Lien vers jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // Fonction pour récupérer les données des offres
-    function fetchOffres() {
+    // Fonction pour récupérer les données des offres avec pagination
+    function fetchOffres(page) {
+        // Récupérer d'abord le nombre total de pages
         $.ajax({
-            url: 'routes/offreApi.php?action=getAllOffres',
+            url: 'routes/offreApi.php?action=getTotalPages&itemsPerPage=5',
             method: 'GET',
             success: function(data) {
-                // console.log('Liste des offres :', data);
-                displayOffres(data);
+                var totalPages = data.total_pages;
+                // console.log(totalPages);
+                // Une fois le nombre total de pages récupéré, récupérer les offres de la page spécifiée
+                $.ajax({
+                    url: 'routes/offreApi.php?action=getAllOffres&page=' + page + '&itemsPerPage=5',
+                    method: 'GET',
+                    success: function(data) {
+                        // console.log('Liste des offres :', data);
+                        displayOffres(data); // Afficher les offres
+                        displayPagination(totalPages, page); // Afficher la pagination
+                    },
+                    error: function(error) {
+                        console.error('Erreur lors de la récupération des offres:', error);
+                    }
+                });
             },
             error: function(error) {
-                console.error('Erreur lors de la récupération des offres:', error);
+                console.error('Erreur lors de la récupération du nombre total de pages:', error);
             }
         });
     }
+
 
     // Fonction pour afficher les données des offres dans une table
     function displayOffres(offres) {
@@ -105,9 +126,27 @@
         $('#offres-table').html(table);
     }
 
-    // Appeler la fonction fetchOffres au chargement de la page
+    // Fonction pour afficher la pagination
+    function displayPagination(totalPages, currentPage) {
+        var pagination = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+        pagination += '<li class="page-item ' + (currentPage == 1 ? 'disabled' : '') + '">';
+        pagination += '<a class="page-link" href="#" onclick="fetchOffres(' + (currentPage - 1) + ')" tabindex="-1" aria-disabled="true">Précédent</a>';
+        pagination += '</li>';
+
+        for (var i = 1; i <= totalPages; i++) {
+            pagination += '<li class="page-item ' + (i == currentPage ? 'active' : '') + '"><a class="page-link" href="#" onclick="fetchOffres(' + i + ')">' + i + '</a></li>';
+        }
+
+        pagination += '<li class="page-item ' + (currentPage == totalPages ? 'disabled' : '') + '">';
+        pagination += '<a class="page-link" href="#" onclick="fetchOffres(' + (currentPage + 1) + ')">Suivant</a>';
+        pagination += '</li></ul></nav>';
+
+        $('#pagination').html(pagination);
+    }
+
+    // Appeler la fonction fetchOffres avec la pagination au chargement de la page
     $(document).ready(function() {
-        fetchOffres();
+        fetchOffres(1); // Récupérer la première page des offres au chargement de la page
     });
 </script>
 <script>

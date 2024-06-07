@@ -7,17 +7,17 @@ $offreController = new OffreController($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($_GET['action'] === 'getAllOffres') {
-        // var_dump($offreController);
-        $offreController->getAllOffres();
+        // Assurez-vous de passer le numéro de page et le nombre d'éléments par page comme paramètres
+        $page = isset($_GET['page']) ? $_GET['page'] : 1; // Par défaut, première page
+        $itemsPerPage = isset($_GET['itemsPerPage']) ? $_GET['itemsPerPage'] : 5; // Par défaut, 5 éléments par page
+        $offreController->getAllOffres($page, $itemsPerPage);
     } elseif ($_GET['action'] === 'getOffreById' && isset($_GET['id'])) {
         $offreId = $_GET['id'];
         $offreController->getOffreById($offreId);
     } elseif ($_GET['action'] === 'getTotalPages') {
         // Assurez-vous de passer le nombre d'éléments par page comme paramètre
-        $itemsPerPage = isset($_GET['itemsPerPage']) ? $_GET['itemsPerPage'] : 5; // Par défaut, 10 éléments par page
+        $itemsPerPage = isset($_GET['itemsPerPage']) ? $_GET['itemsPerPage'] : 5; // Par défaut, 5 éléments par page
         $offreController->getTotalPages($itemsPerPage);
-        var_dump($offreController);
-        die();
     }
     // Ajouter d'autres actions GET si nécessaire
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -44,3 +44,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $offreController->deleteOffre($offreId);
     }
 }
+

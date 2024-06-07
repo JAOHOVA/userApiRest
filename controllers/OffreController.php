@@ -8,12 +8,19 @@ class OffreController {
         $this->offreModel = new Offre($db);
     }
 
-    public function getAllOffres() {
-        // Appeler la méthode du modèle pour récupérer tous les offres
-        $offres = $this->offreModel->getAllOffres();
+    public function getAllOffres($page, $itemsPerPage) {
+        // Appeler la méthode du modèle pour récupérer tous les offres paginés
+        $offres = $this->offreModel->getAllOffres($page, $itemsPerPage);
         // Traiter les données récupérées, les envoyer en tant que réponse JSON
         header('Content-Type: application/json');
         echo json_encode($offres);
+    }
+
+    public function getTotalPages($itemsPerPage) {
+        // Récupérer le nombre total de pages pour la pagination
+        $totalPages = $this->offreModel->getTotalPages($itemsPerPage);
+        header('Content-Type: application/json');
+        echo json_encode(['total_pages' => $totalPages]);
     }
 
     public function getOffreById($offreId) {
@@ -53,7 +60,7 @@ class OffreController {
         }
     }
 
-    public function getTotalPages($itemsPerPage) {
+    /* public function getTotalPages($itemsPerPage) {
         $totalPages = $this->offreModel->getTotalPages($itemsPerPage);
         header('Content-Type: application/json');
         // echo json_encode(['success' => $totalPages]);
@@ -62,5 +69,5 @@ class OffreController {
         } else {
             echo json_encode(["message" => "Erreur lors de l'envoie de total d'offre"]);
         }
-    }
+    } */
 }
