@@ -9,14 +9,35 @@ class Offre {
         $this->db = $db;
     }
 
-    public function getAllOffres($page, $itemsPerPage) {
-        // Récupérer tous les offres paginés depuis la base de données
+    public function getAllOffres($page, $itemsPerPage, $searchQuery = null) {
+        // Préparer la requête SQL de base pour récupérer tous les offres paginés
+        $query = "SELECT * FROM offres";
+    
+        // Ajouter une condition de recherche si un terme de recherche est spécifié
+        if ($searchQuery !== null) {
+            $searchParam = '%' . $searchQuery . '%';
+            $query .= " WHERE titre LIKE :searchParam 
+                        OR description LIKE :searchParam 
+                        OR entreprise LIKE :searchParam 
+                        OR lieu LIKE :searchParam";
+        }
+    
+        // Ajouter la pagination à la requête SQL
+        $query .= " LIMIT :offset, :itemsPerPage";
+    
         try {
             $offset = ($page - 1) * $itemsPerPage;
-            $query = "SELECT * FROM offres LIMIT :offset, :itemsPerPage";
             $statement = $this->db->prepare($query);
+    
+            // Associer les valeurs aux paramètres de la requête
             $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
             $statement->bindParam(':itemsPerPage', $itemsPerPage, PDO::PARAM_INT);
+    
+            // Ajouter les valeurs pour la recherche si nécessaire
+            if ($searchQuery !== null) {
+                $statement->bindParam(':searchParam', $searchParam);
+            }
+    
             $statement->execute();
             $offres = $statement->fetchAll(PDO::FETCH_ASSOC);
             return $offres;
@@ -25,6 +46,7 @@ class Offre {
             return array();
         }
     }
+    
     
     public function getTotalPages($itemsPerPage) {
         try {

@@ -8,9 +8,9 @@ class OffreController {
         $this->offreModel = new Offre($db);
     }
 
-    public function getAllOffres($page, $itemsPerPage) {
+    public function getAllOffres($page, $itemsPerPage, $searchQuery = null) {
         // Appeler la méthode du modèle pour récupérer tous les offres paginés
-        $offres = $this->offreModel->getAllOffres($page, $itemsPerPage);
+        $offres = $this->offreModel->getAllOffres($page, $itemsPerPage, $searchQuery);
         // Traiter les données récupérées, les envoyer en tant que réponse JSON
         header('Content-Type: application/json');
         echo json_encode($offres);

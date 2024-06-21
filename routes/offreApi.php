@@ -10,7 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Assurez-vous de passer le numéro de page et le nombre d'éléments par page comme paramètres
         $page = isset($_GET['page']) ? $_GET['page'] : 1; // Par défaut, première page
         $itemsPerPage = isset($_GET['itemsPerPage']) ? $_GET['itemsPerPage'] : 5; // Par défaut, 5 éléments par page
-        $offreController->getAllOffres($page, $itemsPerPage);
+        $searchQuery = isset($_GET['search']) ? $_GET['search'] : null; // Terme de recherche, s'il existe
+        $offreController->getAllOffres($page, $itemsPerPage, $searchQuery);
     } elseif ($_GET['action'] === 'getOffreById' && isset($_GET['id'])) {
         $offreId = $_GET['id'];
         $offreController->getOffreById($offreId);
@@ -45,3 +46,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
+?>
