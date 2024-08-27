@@ -163,7 +163,13 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label for="editStatut" class="form-label">Statut</label>
-                            <input type="text" class="form-control" id="editStatut" required>
+                            <!-- <input type="text" class="form-control" id="editStatut" required> -->
+                            <select class="form-control" id="editStatut" aria-label="Sélectionnez une option">
+                                <option value="" disabled selected>Click your choice</option>
+                                <option value="En cours">En cours</option>
+                                <option value="Accepté">Accepté</option>
+                                <option value="Refusé">Refusé</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row mb-3">

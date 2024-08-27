@@ -110,7 +110,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="roles" class="form-label">Roles:</label>
-                            <input type="text" class="form-control" id="roles">
+                            <!-- <input type="text" class="form-control" id="roles"> -->
+                            <select class="form-control" id="roles" aria-label="Sélectionnez une option">
+                                <option value="" disabled selected>Open this select menu</option>
+                                <option value="ROLE_ADMIN">ROLE_ADMIN</option>
+                                <option value="ROLE_USER">ROLE_USER</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="active" class="form-label">Actif:</label>
@@ -149,7 +154,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="roles" class="form-label">Roles:</label>
-                            <input type="text" class="form-control" id="sRoles">
+                            <!-- <input type="text" class="form-control" id="sRoles"> -->
+                            <select class="form-control" id="sRoles" aria-label="Sélectionnez une option">
+                                <option value="" disabled selected>Click your choice</option>
+                                <option value="ROLE_ADMIN">ROLE_ADMIN</option>
+                                <option value="ROLE_USER">ROLE_USER</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="sActif" class="form-label">Actif:</label>
