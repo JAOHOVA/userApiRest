@@ -91,7 +91,12 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label for="createStatut" class="form-label">Statut</label>
-                            <input type="text" class="form-control" id="createStatut" required>
+                            <select class="form-control" id="createStatut" aria-label="Sélectionnez une option">
+                                <option value="" disabled selected>Open this select menu</option>
+                                <option value="En cours">En cours</option>
+                                <option value="Accepté">Accepté</option>
+                                <option value="Refusé">Refusé</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -370,7 +375,6 @@
         const entreprise = $('#createEntreprise').val();
         const lieu = $('#createLieu').val();
         const userId = $('#createUserId').val();
-
         $.ajax({
             url: 'routes/offreApi.php?action=createOffre',
             type: 'POST',
